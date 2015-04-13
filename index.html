@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Product Manager</title>
+    <link href="app/css/bootstrap.css" rel="stylesheet">
+    <link href="app/css/main.css" rel="stylesheet">
+  </head>
+  <body>
+    <header class="bs-header">
+      <div class="container">
+        <h1>Product Manager</h1>
+      </div>
+    </header>
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12 main-container">
+        </div>
+      </div>
+    </div>
+
+    <script type="text/template" id="login-template">
+      <header id="header"></header>
+      <div class="login">
+        <form class="login-form">
+          <h2>Log In</h2>
+          <div class="error" style="display:none"></div>
+          <input type="text" id="login-username" placeholder="Username" />
+          <input type="password" id="login-password" placeholder="Password" />
+          <button>Log In</button>
+        </form>
+
+        <form class="signup-form">
+          <h2>Sign Up</h2>
+          <div class="error" style="display:none"></div>
+          <input type="text" id="signup-username" placeholder="Username" />
+          <input type="password" id="signup-password" placeholder="Create a Password" />
+          <button>Sign Up</button>
+        </form>
+      </div>
+    </script>
+
+    <script type="text/template" id="tpl-contacts">
+      <h2 class="page-header text-center">List of products</h2>
+      <p class="text-center">
+        <a href="#contacts/new" class="btn btn-lg btn-outline">Add Product</a>
+      </p>
+      <ul class="media-list row contacts-container"></ul>
+    </script>
+
+    <script type="text/template" id="tpl-contact">
+      <div class="thumbnail">
+        <img class="media-object" src="app/img/faces/<%- avatar %>">
+      </div>
+      <div class="media-heading">
+        <h3>
+          <%- name %>
+          <small>
+            <a href="#contacts/edit/<%- id %>"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a href="#contacts/delete/<%- id %>" class="delete-contract">
+              <span class="glyphicon glyphicon-trash"></span>
+            </a>
+          </small>
+        </h3>
+      </div>
+      <div class="media-body">
+        <dl>
+          <dt>Price:</dt>
+          <dd><%- price %> / <%- unit %></dd>
+          <dt>Description:</dt>
+          <dd><%- description %></dd>
+        </dl>
+      </div>
+      <hr>
+    </script>
+
+    <script type="text/template" id="tpl-new-contact">
+      <h2 class="page-header text-center"><%= isNew ? 'Create' : 'Edit' %> Contact</h2>
+      <form role="form" class="form-horizontal contract-form">
+        <div class="form-group">
+          <label class="col-sm-4 control-label">Product name:</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control contact-name-input" value="<%- name %>">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-4 control-label">Price:</label>
+          <div class="col-sm-6">
+            <input type="price" class="form-control contact-price-input" value="<%- price %>">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-4 control-label">Unit:</label>
+          <div class="col-sm-6">
+            <input type="unit" class="form-control contact-unit-input" value="<%- unit %>">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-4 control-label">Description:</label>
+          <div class="col-sm-6">
+            <input type="description" class="form-control contact-description-input" value="<%- description %>">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-4 col-sm-3">
+            <button type="submit" class="btn btn-outline btn-lg btn-block">Submit</button>
+          </div>
+          <div class="col-sm-3">
+            <a href="#contacts" class="btn btn-outline btn-lg btn-block">Cancel</a>
+          </div>
+        </div>
+      </form>
+    </script>
+
+    <script src="app/js/jquery.js"></script>
+    <script src="app/js/underscore.js"></script>
+    <script src="app/js/backbone.js"></script>
+    <script src="http://www.parsecdn.com/js/parse-1.2.13.min.js"></script>
+
+    <script src="app/js/app.js"></script>
+    <script src="app/js/models/contact.js"></script>
+    <script src="app/js/collections/contacts.js"></script>
+    <script src="app/js/views/contact.js"></script>
+    <script src="app/js/views/contacts.js"></script>
+    <script src="app/js/views/contactForm.js"></script>
+    <script src="app/js/router.js"></script>
+
+    <script>
+      $(function() {
+        ContactManager.start({
+          contacts: [
+          ]
+        });
+      });
+    </script>
+  </body>
+</html>
