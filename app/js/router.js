@@ -1,4 +1,4 @@
-ContactManager.Router = Backbone.Router.extend({
+ContactManager.Router = Parse.Router.extend({
   routes: {
     '': 'home',
     'contacts': 'showContacts',

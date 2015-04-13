@@ -1,3 +1,3 @@
-ContactManager.Collections.Contacts = Backbone.Collection.extend({
+ContactManager.Collections.Contacts = Parse.Collection.extend({
   model: ContactManager.Models.Contact
 });
