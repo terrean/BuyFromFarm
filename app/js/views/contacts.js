@@ -1,5 +1,9 @@
-ContactManager.Views.Contacts = Backbone.View.extend({
+var ViewsContacts = Parse.View.extend({
   template: _.template($('#tpl-contacts').html()),
+
+  events: {
+    "click .log-out": "logOut"
+  },
 
   renderOne: function(contact) {
     var itemView = new ContactManager.Views.Contact({model: contact});
@@ -13,5 +17,14 @@ ContactManager.Views.Contacts = Backbone.View.extend({
     this.collection.each(this.renderOne, this);
 
     return this;
-  }
+  },
+
+    // Logs out the user and shows the login view
+    logOut: function(e) {
+      Parse.User.logOut();
+      new LogInView();
+      this.undelegateEvents();
+      delete this;
+    }
+
 });

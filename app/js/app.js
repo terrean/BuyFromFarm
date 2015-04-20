@@ -15,6 +15,8 @@ $(function() {
     el: ".content",
     
     initialize: function() {
+		
+      $('.main-container').html(_.template($("#login-hide").html()));
       _.bindAll(this, "logIn", "signUp");
       this.render();
     },
@@ -23,15 +25,11 @@ $(function() {
       var self = this;
       var username = this.$("#login-username").val();
       var password = this.$("#login-password").val();
+	  //var hide = this.$el;
      
       Parse.User.logIn(username, password, {
         success: function(user) {
-alert("1");
-			ContactManager.start({
-			  contacts: [
-			  ]
-			});
-
+			new ManageView();
           self.undelegateEvents();
           delete self;
         },
@@ -54,14 +52,9 @@ alert("1");
 
       Parse.User.signUp(username, password, { ACL: new Parse.ACL() }, {
         success: function(user) {
-
-			ContactManager.start({
-			  contacts: [
-			  ]
-			});
-
-          self.undelegateEvents();
-          delete self;
+			new ManageView();
+            self.undelegateEvents();
+            delete self;
         },
 
         error: function(user, error) {
@@ -94,82 +87,115 @@ alert("1");
 
     render: function() {
       if (Parse.User.current()) {
-
-		ContactManager.start({
-		  contacts: [
-		  ]
-		});
-
+		new ManageView();
       } else {
         new LogInView();
       }
     }
   });
 
-  new ContactManager.Router;
+  // The main view that lets a user manage their items
+  var ManageView = Parse.View.extend({
+
+    initialize: function() {
+		this.start({
+		  contacts: [
+		  ]
+		});
+    },
+	
+	start: function(data) {
+		var contacts = new CollectionsContacts(data.contacts),
+			router = new Router();
+
+		$('.content').html(_.template($("#login-hide").html()));
+
+	router.on('route:home', function() {
+	  router.navigate('contacts', {
+		trigger: true,
+		replace: true
+	  });
+	});
+
+	router.on('route:showContacts', function() {
+	  var contactsView = new ViewsContacts({
+		collection: contacts
+	  });
+
+	  $('.main-container').html(contactsView.render().$el);
+	});
+
+	router.on('route:newContact', function() {
+	  var newContactForm = new ViewsContactForm({
+		model: new ModelsContact()
+	  });
+
+	  newContactForm.on('form:submitted', function(attrs) {
+		attrs.id = contacts.isEmpty() ? 1 : (_.max(contacts.pluck('id')) + 1);
+		contacts.add(attrs);
+		router.navigate('contacts', true);
+	  });
+
+	  $('.main-container').html(newContactForm.render().$el);
+	});
+
+	router.on('route:editContact', function(id) {
+	  var contact = contacts.get(id),
+		  editContactForm;
+
+	  if (contact) {
+		editContactForm = new ViewsContactForm({
+			model: contact
+		});
+
+		editContactForm.on('form:submitted', function(attrs) {
+		  contact.set(attrs);
+		  router.navigate('contacts', true);
+		});
+
+		$('.main-container').html(editContactForm.render().$el);
+	  } else {
+		router.navigate('contacts', true);
+	  }
+	});
+
+	// Backbone.history.start();
+	}
+  });
+
+	var ViewsContacts = Parse.View.extend({
+	  template: _.template($('#tpl-contacts').html()),
+
+	  events: {
+		"click .log-out": "logOut"
+	  },
+
+	  renderOne: function(contact) {
+		var itemView = new ContactManager.Views.Contact({model: contact});
+		this.$('.contacts-container').append(itemView.render().$el);
+	  },
+
+	  render: function() {
+		var html = this.template();
+		this.$el.html(html);
+
+		this.collection.each(this.renderOne, this);
+
+		return this;
+	  },
+
+		// Logs out the user and shows the login view
+		logOut: function(e) {
+		  Parse.User.logOut();
+		  new LogInView();
+		  this.undelegateEvents();
+		  delete this;
+		}
+	});
+
+  new Router;
   new AppView;
 
   Parse.history.start();
+
 });
-
-window.ContactManager = {
-  Models: {},
-  Collections: {},
-  Views: {},
-
-  start: function(data) {
-    var contacts = new ContactManager.Collections.Contacts(data.contacts),
-        router = new ContactManager.Router();
-
-    router.on('route:home', function() {
-      router.navigate('contacts', {
-        trigger: true,
-        replace: true
-      });
-    });
-
-    router.on('route:showContacts', function() {
-      var contactsView = new ContactManager.Views.Contacts({
-        collection: contacts
-      });
-
-      $('.main-container').html(contactsView.render().$el);
-    });
-
-    router.on('route:newContact', function() {
-      var newContactForm = new ContactManager.Views.ContactForm({
-        model: new ContactManager.Models.Contact()
-      });
-
-      newContactForm.on('form:submitted', function(attrs) {
-        attrs.id = contacts.isEmpty() ? 1 : (_.max(contacts.pluck('id')) + 1);
-        contacts.add(attrs);
-        router.navigate('contacts', true);
-      });
-
-      $('.main-container').html(newContactForm.render().$el);
-    });
-
-    router.on('route:editContact', function(id) {
-      var contact = contacts.get(id),
-          editContactForm;
-
-      if (contact) {
-        editContactForm = new ContactManager.Views.ContactForm({
-            model: contact
-        });
-
-        editContactForm.on('form:submitted', function(attrs) {
-          contact.set(attrs);
-          router.navigate('contacts', true);
-        });
-
-        $('.main-container').html(editContactForm.render().$el);
-      } else {
-        router.navigate('contacts', true);
-      }
-    });
-
-    // Backbone.history.start();
-  }
-};

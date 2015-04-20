@@ -45,7 +45,14 @@
       </div>
     </script>
 
+    <script type="text/template" id="login-hide">
+		<div></div>
+    </script>
+
     <script type="text/template" id="tpl-contacts">
+      <div id="user-info">
+        Signed in as <%= Parse.User.current().escape("username") %> (<a href="#" class="log-out">Log out</a>)
+      </div>
       <h2 class="page-header text-center">List of products</h2>
       <p class="text-center">
         <a href="#contacts/new" class="btn btn-lg btn-outline">Add Product</a>

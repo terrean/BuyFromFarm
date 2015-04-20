@@ -1,9 +1,8 @@
-ContactManager.Views.ContactForm = Backbone.View.extend({
+var ViewsContactForm = Parse.View.extend({
   template: _.template($('#tpl-new-contact').html()),
 
   events: {
-    'submit .contract-form': 'onFormSubmit',
-      "click .log-out": "logOut"
+    'submit .contract-form': 'onFormSubmit'
   },
 
   render: function() {
@@ -50,13 +49,5 @@ ContactManager.Views.ContactForm = Backbone.View.extend({
 		  }
 	  })
   };**/
-  
-    // Logs out the user and shows the login view
-    logOut: function(e) {
-      Parse.User.logOut();
-      new LogInView();
-      this.undelegateEvents();
-      delete this;
-    },
 
 });

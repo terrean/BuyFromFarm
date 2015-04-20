@@ -1,4 +1,4 @@
-ContactManager.Models.Contact = Backbone.Model.extend({
+var ModelsContact = Parse.Object.extend("Contact", {
   defaults: {
     name: null,
     price: null,

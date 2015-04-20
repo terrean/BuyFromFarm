@@ -1,3 +1,3 @@
-ContactManager.Collections.Contacts = Parse.Collection.extend({
-  model: ContactManager.Models.Contact
+var CollectionsContacts = Parse.Collection.extend({
+  model: ModelsContact
 });
