@@ -16,7 +16,7 @@ var ViewsContactForm = Parse.View.extend({
   onFormSubmit: function(e) {
     e.preventDefault();
 
-	saveProducts();
+	this.saveProducts();
     this.trigger('form:submitted', {
       name: this.$('.contact-name-input').val(),
       price: this.$('.contact-price-input').val(),
@@ -25,7 +25,7 @@ var ViewsContactForm = Parse.View.extend({
     });
 	
   },
-    /**
+    
   saveProducts: function() {
 	  var Product = Parse.Object.extend("Product");
 	  var product = new Product();
@@ -48,6 +48,5 @@ var ViewsContactForm = Parse.View.extend({
 			  console.log(error.message);
 		  }
 	  })
-  };**/
-
+  }
 });

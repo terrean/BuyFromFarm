@@ -6,6 +6,36 @@ $(function() {
   // Initialize Parse with your Parse application javascript keys
   Parse.initialize("lHJYleNOWl4VA3EMnGW9cDoPt4UAgZgXLmkvAaxK", "E5Fcsd8PPtAzAEiWwA9c5WWkoxVEtQWeBjYE1v4v");
 
+	var ViewsContacts = Parse.View.extend({
+		template: _.template($('#tpl-contacts').html()),
+
+		events: {
+			"click .log-out": "logOut"
+		},
+
+		renderOne: function(contact) {
+			var itemView = new ViewsContact({model: contact});
+			this.$('.contacts-container').append(itemView.render().$el);
+		},
+
+		render: function() {
+			var html = this.template();
+			this.$el.html(html);
+
+			this.collection.each(this.renderOne, this);
+
+			return this;
+		},
+
+		// Logs out the user and shows the login view
+		logOut: function(e) {
+			Parse.User.logOut();
+			new LogInView();
+			this.undelegateEvents();
+			delete this;
+		}
+	});
+
   var LogInView = Parse.View.extend({
     events: {
       "submit form.login-form": "logIn",
@@ -30,13 +60,13 @@ $(function() {
       Parse.User.logIn(username, password, {
         success: function(user) {
 			new ManageView();
-          self.undelegateEvents();
-          delete self;
+			self.undelegateEvents();
+			delete self;
         },
 
         error: function(user, error) {
-          self.$(".login-form .error").html("Invalid username or password. Please try again.").show();
-          self.$(".login-form button").removeAttr("disabled");
+            self.$(".login-form .error").html("Invalid username or password. Please try again.").show();
+            self.$(".login-form button").removeAttr("disabled");
         }
       });
 
@@ -72,35 +102,22 @@ $(function() {
       this.$el.html(_.template($("#login-template").html()));
       this.delegateEvents();
     }
-	// Parse.history.start();
-  });
-
-  // The main view for the app
-  var AppView = Parse.View.extend({
-    // Instead of generating a new element, bind to the existing skeleton of
-    // the App already present in the HTML.
-    el: $("#container"),
-
-    initialize: function() {
-      this.render();
-    },
-
-    render: function() {
-      if (Parse.User.current()) {
-		new ManageView();
-      } else {
-        new LogInView();
-      }
-    }
   });
 
   // The main view that lets a user manage their items
   var ManageView = Parse.View.extend({
 
     initialize: function() {
+		
+        // Create our collection of contacts
+        this.contacts = new CollectionsContacts;
+
+        // Setup the query for the collection to look for contacts from the current user
+        this.contacts.query = new Parse.Query(ModelsContact);
+        this.contacts.query.equalTo("user", Parse.User.current());
+        
 		this.start({
-		  contacts: [
-		  ]
+		  this.contacts
 		});
     },
 	
@@ -159,43 +176,29 @@ $(function() {
 	  }
 	});
 
-	// Backbone.history.start();
 	}
   });
 
-	var ViewsContacts = Parse.View.extend({
-	  template: _.template($('#tpl-contacts').html()),
+	// The main view for the app
+	var AppView = Parse.View.extend({
+		// Instead of generating a new element, bind to the existing skeleton of
+		// the App already present in the HTML.
 
-	  events: {
-		"click .log-out": "logOut"
-	  },
+		initialize: function() {
+		  this.render();
+		},
 
-	  renderOne: function(contact) {
-		var itemView = new ContactManager.Views.Contact({model: contact});
-		this.$('.contacts-container').append(itemView.render().$el);
-	  },
-
-	  render: function() {
-		var html = this.template();
-		this.$el.html(html);
-
-		this.collection.each(this.renderOne, this);
-
-		return this;
-	  },
-
-		// Logs out the user and shows the login view
-		logOut: function(e) {
-		  Parse.User.logOut();
-		  new LogInView();
-		  this.undelegateEvents();
-		  delete this;
+		render: function() {
+		  if (Parse.User.current()) {
+			new ManageView();
+		  } else {
+			new LogInView();
+		  }
 		}
 	});
 
-  new Router;
-  new AppView;
+    new Router;
+    new AppView;
 
-  Parse.history.start();
-
+    Parse.history.start();
 });
